@@ -1,0 +1,38 @@
+{
+    "Name": "cat_or_not.Furnace",
+    "Description": "",
+    "Version": "1.0.0",
+    "LoadPriority": 5   ,
+    "ConVars": [],
+    "Scripts": [
+        {
+            "Path": "furnace.nut",
+            "RunOn": "SERVER && MP",
+            "ServerCallback": {
+                "After": "Furnace_Init"
+            }
+        },
+        {
+            "Path": "cl_furnace.nut",
+            "RunOn": "CLIENT && MP",
+            "ClientCallback": {
+                "After": "Furnace_Init"
+            }
+        },
+        {
+            "Path": "ui_furnace.nut",
+            "RunOn": "UI"
+        },
+        {
+            
+            "Path": "sh_furnace.nut",
+            "RunOn": "(CLIENT || SERVER) && MP",
+            "ServerCallback": {
+                "After": "SvShFurnace_Init"
+            },
+            "ClientCallback": {
+                "After": "ClShFurnace_Init"
+            }
+        }
+    ]
+}
