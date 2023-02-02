@@ -13,6 +13,20 @@
             }
         },
         {
+            "Path": "data_bridge.nut",
+            "RunOn": "SERVER && MP",
+            "ServerCallback": {
+                "After": "FDataBridge_Init"
+            }
+        },
+        {
+            "Path": "player_furnace_info.nut",
+            "RunOn": "SERVER && MP",
+            "ServerCallback": {
+                "After": "PlayerInfo_Init"
+            }
+        },
+        {
             "Path": "cl_furnace.nut",
             "RunOn": "CLIENT && MP",
             "ClientCallback": {

@@ -1,5 +1,4 @@
 global function Furnace_Init
-global function FurnaceCallBack_ComfirmedCompilationEnded
 
 void function Furnace_Init()
 {
@@ -8,7 +7,7 @@ void function Furnace_Init()
     InitKeyTracking()
 
     AddClientCommandCallback( "cb", CreateBrush )
-    AddClientCommandCallback( "compile_done", CompileDoneForClient )
+    
 
     PushMapName( GetMapName() )
 
@@ -28,14 +27,6 @@ void function Furnace_Init()
         SetupEditableSkeleton( ent1, ent2, n/2 )
 
     }
-}
-
-bool function CompileDoneForClient( entity player, array<string> args )
-{
-    Chat_ServerBroadcast( player.GetPlayerName() + " is done compiling!" )
-    printt( player.GetPlayerName(), "is done compiling!" )
-
-    return true
 }
 
 bool function CreateBrush( entity player, array<string> args )
@@ -86,8 +77,9 @@ void function CreateBrushThreaded( entity player, int lenght = 1000 )
     array<bool> keys = GetPlayerKeysList( player )
 
     for(;;) {
-        point1.SetOrigin(player.GetOrigin())
-        point2.SetOrigin( player.GetViewVector() * lenght + player.EyePosition() )
+        float snap = GetGridForPlayer( player )
+        point1.SetOrigin( ClampToGrid( player.GetOrigin(), snap  ))
+        point2.SetOrigin( ClampToGrid( player.GetViewVector() * lenght + player.EyePosition(), snap ) )
 
         point1.SetAngles( player.GetAngles() )
         point2.SetAngles( -player.GetAngles() )
@@ -118,6 +110,9 @@ void function SetupEditableSkeleton( entity point1, entity point2, int index )
     point1.SetUsable()
     point1.SetUsableByGroup( "pilot" )
     point1.SetUsePrompts( "Hold %use% to delete this skeleton mesh", "Press %use% to delete this skeleton mesh" )
+
+    point1.SetScriptName( "nessie_node" )
+    point2.SetScriptName( "nessie_node" )
 
     thread EditableSkeletonThink( point2, point1, index )
     thread EditableSkeletonThink( point1, point2, index )
@@ -220,6 +215,11 @@ void function CreateSkeletonRope( array< vector > pts, entity parent_ent  )
     }
 }
 
+vector function ClampToGrid( vector point, float multiple = 16.0  )
+{
+    return < ((point.x + multiple - 1) / multiple) * multiple, ((point.y + multiple - 1) / multiple) * multiple, ((point.z + multiple - 1) / multiple) * multiple >
+}
+
 array<entity> function __GetChildren( entity parentEnt )
 {
     array<entity> ents
@@ -235,64 +235,4 @@ array<entity> function __GetChildren( entity parentEnt )
 	}
 
     return ents
-}
-
-void function FurnaceCallBack_ComfirmedCompilationEnded() 
-{
-    printt( "FurnaceCallBack_ComfirmedCompilationEnded" )
-
-    thread SendFurnaceData()
-}
-
-void function SendFurnaceData()
-{
-    wait 1
-
-    array<string> data_base64 = GetFurnace64BaseData( GetMapName() )
-
-    if ( data_base64.len() == 0 )
-        return
-
-    printt( "sending furnace data to players" )
-
-    wait 1
-    
-    foreach( entity player in GetPlayerArray() )
-    {
-        NSSendInfoMessageToPlayer( player, "Server map compiled" )
-
-        WaitFrame()
-        
-        if ( !NSIsDedicated() && player == GetPlayerArray()[0] )
-        {
-            NSSendInfoMessageToPlayer( player, "you share the map with the server no compiling needed" )
-        }
-        else {
-            NSSendInfoMessageToPlayer( player, "Compiling map" )
-            
-            WaitFrame()
-
-            thread SendChunkedData( player, data_base64 )
-        }
-    }
-}
-
-void function SendChunkedData( entity player, array<string> data )
-{
-    EndSignal( player, "OnDestroy" )
-
-    ServerToClientStringCommand( player, "send_f_data START" )
-
-    WaitFrame()
-
-    foreach( string chunk in data )
-    {
-        string command = format( "send_f_data %s", chunk )
-
-        ServerToClientStringCommand( player, command )
-
-        WaitFrame()
-    }
-
-    ServerToClientStringCommand( player, "send_f_data END" )
 }
