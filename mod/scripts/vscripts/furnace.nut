@@ -77,6 +77,7 @@ void function CreateBrushThreaded( entity player, int lenght = 1000 )
     array<bool> keys = GetPlayerKeysList( player )
 
     for(;;) {
+        lenght = GetEyeDistanceForPlayer( player ).tointeger()
         float snap = GetGridForPlayer( player )
         point1.SetOrigin( ClampToGrid( player.GetOrigin(), snap  ))
         point2.SetOrigin( ClampToGrid( player.GetViewVector() * lenght + player.EyePosition(), snap ) )

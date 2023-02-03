@@ -42,10 +42,10 @@
             "Path": "sh_furnace.nut",
             "RunOn": "(CLIENT || SERVER) && MP",
             "ServerCallback": {
-                "After": "SvShFurnace_Init"
+                "After": "ShFurnace_Init"
             },
             "ClientCallback": {
-                "After": "ClShFurnace_Init"
+                "After": "ShFurnace_Init"
             }
         }
     ]

@@ -1,18 +1,6 @@
-#if SERVER
-global function SvShFurnace_Init
-#elseif CLIENT
-global function ClShFurnace_Init
-#endif
+global function ShFurnace_Init
 
-#if SERVER
-void function SvShFurnace_Init()
+void function ShFurnace_Init()
 {
     printt( "do smth" )
 }
-
-#elseif CLIENT
-void function ClShFurnace_Init()
-{
-    printt( "do smth" )
-}
-#endif
