@@ -3,6 +3,14 @@ global function FurnaceCallBack_NewGrid
 global function FurnaceCallBack_InstantSnap
 global function FurnaceCallBack_NewBrush
 global function FurnaceCallBack_NewEyeDistance
+global function FurnaceCallBack_DeleteMesh
+global function FurnaceCallBack_NudgeZUp
+global function FurnaceCallBack_NudgeZDown
+global function FurnaceCallBack_NudgeYUp
+global function FurnaceCallBack_NudgeYDown
+global function FurnaceCallBack_NudgeXUp
+global function FurnaceCallBack_NudgeXDown
+
 
 void function FurnaceCallBack_ComfirmedCompilationEnded()
 {
@@ -27,4 +35,39 @@ void function FurnaceCallBack_NewBrush()
 void function FurnaceCallBack_NewEyeDistance()
 {
     ClientCommand( "new_eye_distance " + FurnaceGetEyeDistance() )
+}
+
+void function FurnaceCallBack_DeleteMesh()
+{
+    ClientCommand( "delete_mesh " + FurnaceGetCurrentMesh() )
+}
+
+void function FurnaceCallBack_NudgeZUp()
+{
+    ClientCommand( format("nudge_z %d 1", FurnaceGetCurrentMesh() ) )
+}
+
+void function FurnaceCallBack_NudgeZDown()
+{
+    ClientCommand( format("nudge_z %d -1", FurnaceGetCurrentMesh() ) )
+}
+
+void function FurnaceCallBack_NudgeYUp()
+{
+    ClientCommand( format("nudge_y %d 1", FurnaceGetCurrentMesh() ) )
+}
+
+void function FurnaceCallBack_NudgeYDown()
+{
+    ClientCommand( format("nudge_y %d -1", FurnaceGetCurrentMesh() ) )
+}
+
+void function FurnaceCallBack_NudgeXUp()
+{
+    ClientCommand( format("nudge_x %d 1", FurnaceGetCurrentMesh() ) )
+}
+
+void function FurnaceCallBack_NudgeXDown()
+{
+    ClientCommand( format("nudge_x %d -1", FurnaceGetCurrentMesh() ) )
 }

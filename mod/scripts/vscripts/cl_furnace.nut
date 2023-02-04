@@ -1,4 +1,6 @@
 global function Furnace_Init
+global function ServerCallback_CloseEntityId
+global function ServerCallback_OpenEntityId
 
 struct {
     bool chunked_data_in = false
@@ -50,3 +52,12 @@ void function ProccesRawFurnaceData( array<string> args )
     file.chunked_data.append( raw )
 }
 
+void function ServerCallback_CloseEntityId()
+{
+    ClientRemoveMeshIndex()
+}
+
+void function ServerCallback_OpenEntityId( int id )
+{
+    ClientPushMeshIndex( id )
+}

@@ -98,6 +98,8 @@ void function CreateBrushThreaded( entity player, int lenght = 1000 )
 
     int index = PushMesh( point1.GetOrigin(), point2.GetOrigin() )
     SetupEditableSkeleton( point1, point2, index )
+
+    Remote_CallFunction_NonReplay( player, "ServerCallback_OpenEntityId", index )
 }
 
 void function SetupEditableSkeleton( entity point1, entity point2, int index )
