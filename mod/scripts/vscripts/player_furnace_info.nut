@@ -12,6 +12,10 @@ void function PlayerInfo_Init()
     AddClientCommandCallback( "new_grid", NewGridPush )
     AddClientCommandCallback( "new_eye_distance", NewEyeDistancePush )
     AddClientCommandCallback( "snap_instant", InstantSnapView )
+    AddClientCommandCallback( "delete_mesh", DeleteMesh )
+    AddClientCommandCallback( "nudge_z", NudgeZ )
+    AddClientCommandCallback( "nudge_y", NudgeY )
+    AddClientCommandCallback( "nudge_x", NudgeX )
 
     AddCallback_OnClientConnected( SetupFurnacePlayer )
 
@@ -54,6 +58,73 @@ bool function InstantSnapView( entity player, array<string> args )
     player.SetAngles( angles )
 
     return true
+}
+
+bool function DeleteMesh( entity player, array<string> args )
+{
+    if ( args.len() != 1 )
+        return true
+
+    try {
+        RemoveMesh( args[0].tointeger() )
+
+        Remote_CallFunction_NonReplay( player, "ServerCallback_CloseEntityId" )
+        
+        GetEnt( args[0] ).Destroy()
+    } 
+    catch(err) {
+        
+    }
+
+    return true
+}
+
+bool function NudgeZ( entity player, array<string> args )
+{
+    if ( args.len() != 2 )
+        return true
+
+    entity node = GetEnt( args[0] )
+
+    Nudge( player, node, <0,0,args[1].tofloat()> )
+
+    return true
+}
+
+bool function NudgeY( entity player, array<string> args )
+{
+    if ( args.len() != 2 )
+        return true
+
+    entity node = GetEnt( args[0] )
+
+    Nudge( player, node, <0,args[1].tofloat(),0> )
+
+    return true
+}
+
+bool function NudgeX( entity player, array<string> args )
+{
+    if ( args.len() != 2 )
+        return true
+
+    entity node = GetEnt( args[0] )
+
+    Nudge( player, node, <args[1].tofloat(),0,0> )
+
+    return true
+}
+
+void function Nudge( entity player, entity node, vector dir )
+{
+    if ( !IsValid( node ) )
+        Remote_CallFunction_NonReplay( player, "ServerCallback_CloseEntityId" )
+    
+    table data
+    
+    data.dir <- dir
+
+    node.Signal( "MoveNessieNode", data )
 }
 
 float function GetGridForPlayer( entity player )

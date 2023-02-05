@@ -44,30 +44,30 @@ void function FurnaceCallBack_DeleteMesh()
 
 void function FurnaceCallBack_NudgeZUp()
 {
-    ClientCommand( format("nudge_z %d 1", FurnaceGetCurrentMesh() ) )
+    ClientCommand( format("nudge_z %d %d", FurnaceGetCurrentMesh(), FurnaceGetNudgeValue() ) )
 }
 
 void function FurnaceCallBack_NudgeZDown()
 {
-    ClientCommand( format("nudge_z %d -1", FurnaceGetCurrentMesh() ) )
+    ClientCommand( format("nudge_z %d %d", FurnaceGetCurrentMesh(), -FurnaceGetNudgeValue() ) )
 }
 
 void function FurnaceCallBack_NudgeYUp()
 {
-    ClientCommand( format("nudge_y %d 1", FurnaceGetCurrentMesh() ) )
+    ClientCommand( format("nudge_y %d %d", FurnaceGetCurrentMesh(), FurnaceGetNudgeValue() ) )
 }
 
 void function FurnaceCallBack_NudgeYDown()
 {
-    ClientCommand( format("nudge_y %d -1", FurnaceGetCurrentMesh() ) )
+    ClientCommand( format("nudge_y %d %d", FurnaceGetCurrentMesh(), -FurnaceGetNudgeValue() ) )
 }
 
 void function FurnaceCallBack_NudgeXUp()
 {
-    ClientCommand( format("nudge_x %d 1", FurnaceGetCurrentMesh() ) )
+    ClientCommand( format("nudge_x %d %d", FurnaceGetCurrentMesh(), FurnaceGetNudgeValue() ) )
 }
 
 void function FurnaceCallBack_NudgeXDown()
 {
-    ClientCommand( format("nudge_x %d -1", FurnaceGetCurrentMesh() ) )
+    ClientCommand( format("nudge_x %d %d", FurnaceGetCurrentMesh(), -FurnaceGetNudgeValue() ) )
 }

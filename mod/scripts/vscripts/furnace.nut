@@ -5,21 +5,18 @@ void function Furnace_Init()
     PrecacheModel( $"models/domestic/nessy_doll.mdl" )
 
     InitKeyTracking()
+    RegisterSignal( "MoveNessieNode" )
 
     AddClientCommandCallback( "cb", CreateBrush )
     
-
     PushMapName( GetMapName() )
 
-    
     array<vector> points = GetMeshes( GetMapName() )
 
     for( int n = 0; n < points.len(); n += 2 )
     {
         vector point1 = points[n]
         vector point2 = points[n+1]
-
-        // printt( point1, point2 )
 
         entity ent1 = CreatePropDynamic( $"models/domestic/nessy_doll.mdl", point1, <0,0,0>, SOLID_VPHYSICS, 10000 )
         entity ent2 = CreatePropDynamic( $"models/domestic/nessy_doll.mdl", point2, <0,0,0>, SOLID_VPHYSICS, 10000 )
@@ -108,17 +105,22 @@ void function SetupEditableSkeleton( entity point1, entity point2, int index )
 
     point2.SetUsable()
     point2.SetUsableByGroup( "pilot" )
-    point2.SetUsePrompts( "Hold %use% to delete this skeleton mesh", "Press %use% to delete this skeleton mesh" )
+    point2.SetUsePrompts( "Hold %use% to edit this skeleton mesh", "Press %use% to edit this skeleton mesh" )
 
     point1.SetUsable()
     point1.SetUsableByGroup( "pilot" )
-    point1.SetUsePrompts( "Hold %use% to delete this skeleton mesh", "Press %use% to delete this skeleton mesh" )
+    point1.SetUsePrompts( "Hold %use% to edit this skeleton mesh", "Press %use% to edit this skeleton mesh" )
 
     point1.SetScriptName( "nessie_node" )
     point2.SetScriptName( "nessie_node" )
+    SetTargetName( point1, index.tostring() )
+    SetTargetName( point2, index.tostring() )
 
     thread EditableSkeletonThink( point2, point1, index )
     thread EditableSkeletonThink( point1, point2, index )
+
+    thread MoveNessieSkeleton( point2, point1, index )
+    thread MoveNessieSkeleton( point1, point2, index )
 }
 
 void function EditableSkeletonThink( entity point, entity other_point, int index )
@@ -159,9 +161,30 @@ void function EditableSkeletonThink( entity point, entity other_point, int index
     {
         entity player = expect entity( point.WaitSignal( "OnPlayerUse" ).player )
 
-        RemoveMesh( index )
+        Remote_CallFunction_NonReplay( player, "ServerCallback_OpenEntityId", index )
+    }
+}
 
-        break
+void function MoveNessieSkeleton( entity point, entity other_point, int index )
+{
+    point.EndSignal( "OnDestroy" )
+    other_point.EndSignal( "OnDestroy" )
+    
+    for(;;)
+    {
+        vector dir = expect vector( point.WaitSignal( "MoveNessieNode" ).dir )
+
+        point.SetOrigin( point.GetOrigin() + dir )
+        other_point.SetOrigin( other_point.GetOrigin() + dir )
+
+        if ( MoveMesh( index, dir ) == 1 && IsValid( point ) )
+            point.Destroy()
+            
+        foreach( entity child in __GetChildren( point ) )
+        {
+            if ( IsValid( child ) )
+                child.Destroy()
+        }
     }
 }
 
