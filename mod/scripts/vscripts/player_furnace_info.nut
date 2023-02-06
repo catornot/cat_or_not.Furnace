@@ -16,6 +16,7 @@ void function PlayerInfo_Init()
     AddClientCommandCallback( "nudge_z", NudgeZ )
     AddClientCommandCallback( "nudge_y", NudgeY )
     AddClientCommandCallback( "nudge_x", NudgeX )
+    AddClientCommandCallback( "new_texture", NewTexture )
 
     AddCallback_OnClientConnected( SetupFurnacePlayer )
 
@@ -111,6 +112,22 @@ bool function NudgeX( entity player, array<string> args )
     entity node = GetEnt( args[0] )
 
     Nudge( player, node, <args[1].tofloat(),0,0> )
+
+    return true
+}
+
+bool function NewTexture( entity player, array<string> args )
+{
+    if ( args.len() != 2 )
+        return true
+    
+    try {
+        if ( SetTextureForMesh( args[0].tointeger(), args[1] ) == 1 )
+            Remote_CallFunction_NonReplay( player, "ServerCallback_CloseEntityId" )
+    } 
+    catch(err) {
+        Remote_CallFunction_NonReplay( player, "ServerCallback_CloseEntityId" )
+    }
 
     return true
 }
