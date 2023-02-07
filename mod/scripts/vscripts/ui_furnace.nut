@@ -21,6 +21,11 @@ void function FurnaceCallBack_NewBrush()
     ClientCommand( "cb" )
 }
 
+void function FurnaceCallBack_NewBrushStaged()
+{
+    ClientCommand( "cbs" )
+}
+
 void function FurnaceCallBack_NewEyeDistance()
 {
     ClientCommand( "new_eye_distance " + FurnaceGetEyeDistance() )

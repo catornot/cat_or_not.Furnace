@@ -8,6 +8,7 @@ void function Furnace_Init()
     RegisterSignal( "MoveNessieNode" )
 
     AddClientCommandCallback( "cb", CreateBrush )
+    AddClientCommandCallback( "cbs", CreateBrushStaged )
     
     PushMapName( GetMapName() )
 
@@ -28,16 +29,8 @@ void function Furnace_Init()
 
 bool function CreateBrush( entity player, array<string> args )
 {
-    try {
-        if ( args.len() > 0 )
-            thread CreateBrushThreaded( player, args[0].tointeger() )
-        else 
-            thread CreateBrushThreaded( player )
-            
-    } 
-    catch( err ) {
-        thread CreateBrushThreaded( player )
-    }
+    thread CreateBrushThreaded( player )
+
     return true
 }
 
@@ -78,6 +71,71 @@ void function CreateBrushThreaded( entity player, int lenght = 1000 )
         float snap = GetGridForPlayer( player )
         point1.SetOrigin( ClampToGrid( player.GetOrigin(), snap  ))
         point2.SetOrigin( ClampToGrid( player.GetViewVector() * lenght + player.EyePosition(), snap ) )
+
+        point1.SetAngles( player.GetAngles() )
+        point2.SetAngles( -player.GetAngles() )
+
+        keys = GetPlayerKeysList( player )
+
+        if ( keys[KU] && keys[KD] )
+            break
+
+        wait 0
+    }
+
+    point1.Solid()
+    point2.Solid()
+
+    int index = PushMesh( point1.GetOrigin(), point2.GetOrigin() )
+    SetupEditableSkeleton( point1, point2, index )
+
+    Remote_CallFunction_NonReplay( player, "ServerCallback_OpenEntityId", index )
+}
+
+bool function CreateBrushStaged( entity player, array<string> args )
+{
+    thread CreateBrush2StagedThreaded( player )
+
+    return true
+}
+
+void function CreateBrush2StagedThreaded( entity player )
+{
+    player.EndSignal( "OnDeath" )
+    player.EndSignal( "OnDestroy" )
+
+    float snap = GetGridForPlayer( player )
+
+    entity point1 = CreatePropDynamic( $"models/domestic/nessy_doll.mdl", ClampToGrid( player.GetOrigin(), snap ), player.GetAngles(), SOLID_VPHYSICS, 10000 )
+    entity point2 = CreatePropDynamic( $"models/domestic/nessy_doll.mdl", ClampToGrid( player.GetOrigin(), snap ), -player.GetAngles(), SOLID_VPHYSICS, 10000 )
+
+    point1.NotSolid()
+    point2.NotSolid()
+
+    string unique_id = UniqueString( "CurrentMode" )
+
+    NSCreateStatusMessageOnPlayer( player, "Mode", "2 Stage Building", unique_id )
+
+    OnThreadEnd(
+	function() : ( player, unique_id, point1, point2 )
+		{
+            if ( IsValid( player ) ) 
+                NSDeleteStatusMessageOnPlayer( player, unique_id )
+            
+            if ( !IsValid( player ) || !IsAlive( player ) )
+            {
+                point1.Destroy()
+                point2.Destroy()
+                return
+            }
+		}
+	)
+
+    array<bool> keys = GetPlayerKeysList( player )
+
+    for(;;) {
+        snap = GetGridForPlayer( player )
+        point2.SetOrigin( ClampToGrid( player.GetOrigin(), snap ) )
 
         point1.SetAngles( player.GetAngles() )
         point2.SetAngles( -player.GetAngles() )
