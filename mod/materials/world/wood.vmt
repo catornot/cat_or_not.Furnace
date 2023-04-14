@@ -1,0 +1,6 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "world/wood"
+	"$normalmap" "world/wood_N"
+	"$surfaceprop" "default"
+}

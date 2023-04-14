@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "world/dev/dev_blue_512"
+	"$surfaceprop" "default"
+}

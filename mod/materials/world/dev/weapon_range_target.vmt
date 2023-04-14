@@ -1,0 +1,5 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "world/dev/weapon_range_target"
+	"$surfaceprop" "default"
+}

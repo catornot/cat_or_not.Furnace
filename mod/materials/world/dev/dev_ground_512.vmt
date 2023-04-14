@@ -1,0 +1,5 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "world/dev/dev_ground_512"
+	"$surfaceprop" "default"
+}
